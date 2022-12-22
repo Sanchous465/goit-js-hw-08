@@ -1,34 +1,19 @@
-import { galleryItems } from './gallery-items';
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
+import { galleryItems } from './gallery-items.js';
+import { itemSimpleLightbox } from './item.js';
+import SimpleLightbox from 'simplelightbox';
+import '/node_modules/simplelightbox/dist/simple-lightbox.min.css';
 
-const galleryEl = document.querySelector('.gallery'); 
+const galleryEl = document.querySelector('.gallery');
 
-
-// Завдання 8.1.2
-
-const galleryMarkup = galleryItems
-    .map(({ original, preview, description }) => `
-            <div class="gallery__item">
-                <a class="gallery__link" href="${original}">
-                    <img
-                        class="gallery__image"
-                        src="${preview}"
-                        alt="${description}"
-                    />
-                </a>
-            </div>`)
-    .join("");
-
-galleryEl.insertAdjacentHTML("beforeend", galleryMarkup);
-
-console.log(galleryEl);
-
-const lightboxOptions = {
-  captions: true,
-  captionsData: "alt",
-  captionDelay: 250,
+const getImageCollection = () => {
+  const container = galleryItems.map(itemSimpleLightbox);
+  galleryEl.insertAdjacentHTML('afterbegin', container.join(''));
 };
 
-const lightboxGallery = new SimpleLightbox(".gallery a", lightboxOptions);
-console.log(galleryItems);
+getImageCollection();
+
+let lightbox = new SimpleLightbox('.gallery a', {
+  captionsData: 'alt',
+  captionDelay: 250,
+  disableRightClick: true,
+});
