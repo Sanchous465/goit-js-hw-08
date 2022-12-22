@@ -1,19 +1,34 @@
-import { galleryItems } from './gallery-items.js';
-import { itemSimpleLightbox } from './item.js';
+// Add imports above this line
+import { galleryItems } from './gallery-items';
+// Change code below this line
 import SimpleLightbox from 'simplelightbox';
-import '/node_modules/simplelightbox/dist/simple-lightbox.min.css';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
+console.log(galleryItems);
 
 const galleryEl = document.querySelector('.gallery');
 
-const getImageCollection = () => {
-  const container = galleryItems.map(itemSimpleLightbox);
-  galleryEl.insertAdjacentHTML('afterbegin', container.join(''));
-};
+galleryEl.insertAdjacentHTML('beforeend', createGalleryCards(galleryItems));
 
-getImageCollection();
+function createGalleryCards(galleryItems) {
+  return galleryItems
+    .map(({ preview, original, description }) => {
+      return `
+            <div>
+                <a class="gallery__item" href="${original}">
+                    <img
+                        class="gallery__image"
+                        src="${preview}"
+                        alt="${description}"
+                    />
+                </a>
+                </div>
+            `;
+    })
+    .join('');
+}
 
-let lightbox = new SimpleLightbox('.gallery a', {
+new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
-  captionDelay: 250,
-  disableRightClick: true,
+  captionsDelay: 250,
 });

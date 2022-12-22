@@ -2,58 +2,36 @@ import throttle from 'lodash.throttle';
 
 const refs = {
   form: document.querySelector('.feedback-form'),
-  email: document.querySelector('input[type="email"]'),
-  message: document.querySelector('textarea[name="message"]'),
+  textarea: document.querySelector('.feedback-form textarea'),
 };
+const KEY_FORM = 'feedback-form-state';
+const dataForm = {};
 
-refs.form.addEventListener('input', throttle(onInput, 500));
-refs.form.addEventListener('submit', onFormSubmit);
+refs.form.addEventListener('submit', submitForm);
+refs.form.addEventListener('input', throttle(inputForm, 100));
+populateMessageOutput();
 
-const STORAGE_INPUT_KEY = 'feedback-form-state';
+function submitForm(evt) {
+  evt.preventDefault();
 
-function onInput(e) {
-  const userDetails = JSON.parse(localStorage.getItem(STORAGE_INPUT_KEY)) || {};
-  console.log(userDetails);
-  userDetails[e.target.name] = e.target.value;
-
-  localStorage.setItem(STORAGE_INPUT_KEY, JSON.stringify(userDetails));
-}
-
-const saveLocalItems = localStorage.getItem(STORAGE_INPUT_KEY);
-const parsSaveLocalItems = JSON.parse(saveLocalItems);
-
-function getLocalStorageItems() {
-  if (saveLocalItems) {
-    !parsSaveLocalItems.email
-      ? ''
-      : (refs.email.value = parsSaveLocalItems.email);
-    !parsSaveLocalItems.message
-      ? ''
-      : (refs.message.value = parsSaveLocalItems.message);
+  if (dataForm.email || dataForm.message) {
+    console.log(dataForm);
   }
+  evt.currentTarget.reset();
+  localStorage.removeItem(KEY_FORM);
 }
 
-getLocalStorageItems();
+function inputForm(evt) {
+  dataForm[evt.target.name] = evt.target.value;
+  const dataJSON = JSON.stringify(dataForm);
+  localStorage.setItem(KEY_FORM, dataJSON);
+}
 
-function onFormSubmit(e) {
-  e.preventDefault();
+function populateMessageOutput() {
+  const dataForm = JSON.parse(localStorage.getItem(KEY_FORM));
 
-  const {
-    elements: { email, message },
-  } = e.currentTarget;
-
-  if (email.value === '' || message.value === '') {
-    return alert('Введіть всі поля форми!!!');
+  if (dataForm) {
+    refs.form.email.value = dataForm.email;
+    refs.form.message.value = dataForm.message;
   }
-
-  const formElDetails = { email: email.value, message: message.value };
-  console.log(formElDetails);
-
-  e.currentTarget.reset();
-
-  removeStorageItems();
-}
-
-function removeStorageItems() {
-  localStorage.removeItem(STORAGE_INPUT_KEY);
 }
